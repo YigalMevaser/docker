@@ -19,27 +19,27 @@ RUN Invoke-WebRequest https://api.nuget.org/packages/microsoft.net.compilers.2.3
 ENV ROSLYN_COMPILER_LOCATION c:\\RoslynCompilers\\tools
 
 RUN Add-WindowsFeature Web-Server; \
-	Add-WindowsFeature Web-Windows-Auth; \
-	Add-WindowsFeature Web-Stat-Compression; \
-	Add-WindowsFeature Web-Dyn-Compression; \	 
+    Add-WindowsFeature Web-Windows-Auth; \
+    Add-WindowsFeature Web-Stat-Compression; \
+    Add-WindowsFeature Web-Dyn-Compression; \	 
     Add-WindowsFeature NET-Framework-45-ASPNET; \
     Add-WindowsFeature Web-Asp-Net45; \
-	Add-WindowsFeature NET-WCF-TCP-Activation45; \ 
-	Add-WindowsFeature NET-WCF-HTTP-Activation45; \
-	Add-WindowsFeature Web-WebSockets; \
-	Add-WindowsFeature Web-Mgmt-Service; \
+    Add-WindowsFeature NET-WCF-TCP-Activation45; \ 
+    Add-WindowsFeature NET-WCF-HTTP-Activation45; \
+    Add-WindowsFeature Web-WebSockets; \
+    Add-WindowsFeature Web-Mgmt-Service; \
     Add-WindowsFeature Web-ISAPI-Ext; \
     Add-WindowsFeature Web-ISAPI-Filter; \
     Add-WindowsFeature Web-Basic-Auth; \
     Invoke-WebRequest -Uri  https://dotnetbinaries.blob.core.windows.net/servicemonitor/2.0.1.1/ServiceMonitor.exe -OutFile C:\ServiceMonitor.exe
 	
 RUN New-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1 -Force; \
-	Set-Service -name WMSVC -StartupType Automatic;
+    Set-Service -name WMSVC -StartupType Automatic;
 
 ENTRYPOINT ["C:\\ServiceMonitor.exe", "w3svc"]
 
 RUN NET USER $Env:USER_IIS_MANAGER $Env:USER_IIS_PASSWORD /ADD ; \
-	NET LOCALGROUP "Administrators" $Env:USER_IIS_MANAGER /ADD ;
+    NET LOCALGROUP "Administrators" $Env:USER_IIS_MANAGER /ADD ;
 
 RUN windows\system32\inetsrv\appcmd.exe set config 'Default Web Site/' -section:system.webServer/security/authentication/windowsAuthentication /enabled:"True" /commit:apphost ; \
     windows\system32\inetsrv\appcmd.exe set app 'Default Web Site/' /enabledProtocols:"http,net.tcp" /commit:apphost ;
