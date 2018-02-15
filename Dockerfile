@@ -1,7 +1,7 @@
 FROM microsoft/dotnet-framework:4.7.1-windowsservercore-1709
 
-ENV USER-IIS-MANAGER iis-manager
-ENV USER-IIS-PASSWORD Password01!
+ENV USER_IIS_MANAGER iis-manager
+ENV USER_IIS_PASSWORD Password01!
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
@@ -38,8 +38,8 @@ RUN New-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\WebManagement\Server -Name E
 
 ENTRYPOINT ["C:\\ServiceMonitor.exe", "w3svc"]
 
-RUN NET USER "${USER-IIS-MANAGER}" "${USER-IIS-PASSWORD}" /ADD; \
-	NET LOCALGROUP "Administrators" "${USER-IIS-MANAGER}" /ADD;
+RUN NET USER $Env:USER_IIS_MANAGER $Env:USER_IIS_PASSWORD /ADD ; \
+	NET LOCALGROUP "Administrators" $Env:USER_IIS_MANAGER /ADD ;
 
 RUN windows\system32\inetsrv\appcmd.exe set config 'Default Web Site/' -section:system.webServer/security/authentication/windowsAuthentication /enabled:"True" /commit:apphost ; \
     windows\system32\inetsrv\appcmd.exe set app 'Default Web Site/' /enabledProtocols:"http,net.tcp" /commit:apphost ;
